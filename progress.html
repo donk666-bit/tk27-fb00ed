@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>我的进度</title>
+<style>
+body{margin:0;background:#f5f6f7;color:#1d2129;font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:16px 12px 40px}
+h1{font-size:19px;margin:6px 0 2px}.sub{color:#8a8f98;font-size:13px;margin:0 0 14px}
+a.back{color:#0d6b3d;text-decoration:none;font-size:14px}
+.tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;font-size:14px}
+.tbl th,.tbl td{padding:9px 10px;border-bottom:1px solid #eef1f5;text-align:right}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl th{background:#f0f7f3;color:#0d6b3d;font-weight:600;font-size:13px}
+.tbl tr:last-child td{border-bottom:0}
+.bar{height:5px;background:#eef1f5;border-radius:3px;overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:#0d6b3d}
+h2{font-size:15px;margin:20px 0 8px}
+.empty{background:#fff;border-radius:12px;padding:14px;color:#8a8f98;font-size:14px}
+</style></head><body><div class="wrap">
+<h1>我的进度</h1><p class="sub">数据来自本浏览器本地存储；清缓存或换设备会丢失。</p>
+<a class="back" href="index.html">‹ 返回首页</a>
+<div id="app"></div></div>
+<script>
+const MANIFEST = [{"kind": "bank", "key": "ly:yc80", "name": "奕诚-一般能力", "url": "bank/奕诚-一般能力-刷题.html", "total": 900}, {"kind": "bank", "key": "ly:yc113", "name": "奕诚-公共与行业知识", "url": "bank/奕诚-公共与行业知识-刷题.html", "total": 832}, {"kind": "bank", "key": "ly:yc117", "name": "奕诚-工程力学", "url": "bank/奕诚-工程力学-刷题.html", "total": 300}, {"kind": "bank", "key": "ly:yc78", "name": "奕诚-数学", "url": "bank/奕诚-数学-刷题.html", "total": 1030}, {"kind": "bank", "key": "ly:yc98", "name": "奕诚-时政", "url": "bank/奕诚-时政-刷题.html", "total": 476}, {"kind": "bank", "key": "ly:yc51", "name": "奕诚-电力系统基础", "url": "bank/奕诚-电力系统基础-刷题.html", "total": 800}, {"kind": "bank", "key": "ly:yc77", "name": "奕诚-电工技术基础", "url": "bank/奕诚-电工技术基础-刷题.html", "total": 804}, {"kind": "bank", "key": "ly:yc79", "name": "奕诚-计算机基础", "url": "bank/奕诚-计算机基础-刷题.html", "total": 700}, {"kind": "bank", "key": "ly:1709fe15037ce0f2", "name": "国网其他工学基础题库", "url": "bank/国网其他工学基础题库-刷题.html", "total": 2660}, {"kind": "bank", "key": "ly:18a72ad3e4bfce10", "name": "国网其他工学强化题库", "url": "bank/国网其他工学强化题库-刷题.html", "total": 997}, {"kind": "bank", "key": "ly:17a1f1d7cd65cf84", "name": "南网其他理工基础题库", "url": "bank/南网其他理工基础题库-刷题.html", "total": 2050}, {"kind": "bank", "key": "ly:18a72b16d86c2710", "name": "南网其他理工强化题库", "url": "bank/南网其他理工强化题库-刷题.html", "total": 691}, {"kind": "paper", "key": "luoyan_mock_v1_set1", "name": "国网其他工学类2027新考纲模拟卷1", "url": "paper/珞研2027新考纲模拟卷1.html", "total": 165}, {"kind": "paper", "key": "luoyan_mock_v1_set2", "name": "国网其他工学类2027新考纲模拟卷2", "url": "paper/珞研2027新考纲模拟卷2.html", "total": 165}, {"kind": "paper", "key": "luoyan_mock_v1_set3", "name": "国网其他工学类2027新考纲模拟卷3", "url": "paper/珞研2027新考纲模拟卷3.html", "total": 165}, {"kind": "paper", "key": "luoyan_mock_v1_set4", "name": "国网其他工学类2027新考纲模拟卷4", "url": "paper/珞研2027新考纲模拟卷4.html", "total": 165}, {"kind": "paper", "key": "luoyan_mock_v1_set5", "name": "国网其他工学类2027新考纲模拟卷5", "url": "paper/珞研2027新考纲模拟卷5.html", "total": 165}, {"kind": "paper", "key": "luoyan_mock_v1_set6", "name": "国网其他工学类2027新考纲模拟卷6", "url": "paper/珞研2027新考纲模拟卷6.html", "total": 165}, {"kind": "paper", "key": "luoyan_mock_v1_set7", "name": "国网其他工学类2027新考纲模拟卷7", "url": "paper/珞研2027新考纲模拟卷7.html", "total": 165}, {"kind": "paper", "key": "luoyan_mock_v1_set8", "name": "国网其他工学类2027新考纲模拟卷8", "url": "paper/珞研2027新考纲模拟卷8.html", "total": 165}];
+function read(key){ try { return JSON.parse(localStorage.getItem(key)) || null } catch(e){ return null } }
+function pct(x,y){ return y ? Math.round(x*100/y) : 0 }
+function row(name, url, done, total, right, wrongN, extra){
+  const p = pct(done,total);
+  return '<tr><td><a href="'+url+'" style="color:#1d2129;text-decoration:none">'+name+'</a></td>'
+    + '<td>'+done+' / '+total+'</td>'
+    + '<td><div class="bar"><i style="width:'+p+'%"></i></div></td>'
+    + '<td>'+(right==null?'—':pct(right, done))+'%</td>'
+    + '<td>'+wrongN+'</td><td>'+extra+'</td></tr>';
+}
+const banks = MANIFEST.filter(x=>x.kind==='bank'), papers = MANIFEST.filter(x=>x.kind==='paper');
+let rowsB = '', rowsP = '';
+banks.forEach(function(it){
+  const st = read(it.key) || {};
+  const wrong = st.wrong ? Object.keys(st.wrong).length : 0;
+  const collect = st.collect ? Object.keys(st.collect).length : 0;
+  const ans = st.ans || {};
+  const done = Object.keys(ans).length;
+  const right = Object.keys(ans).filter(function(k){ return ans[k] && ans[k].ok; }).length;
+  const stat = st.stats || {r:0,w:0};
+  if (!it._warned) it._warned = 0;
+  rowsB += row(it.name, it.url, done, it.total, right, wrong, '收藏 '+collect);
+});
+papers.forEach(function(it){
+  const st = read(it.key) || {};
+  const ans = st.answers || {};
+  const done = Object.keys(ans).filter(function(k){ return ans[k] && ans[k].length; }).length;
+  const wrong = st.wrongSet ? Object.keys(st.wrongSet).length : 0;
+  rowsP += row(it.name, it.url, done, it.total, null, wrong, st.submitted ? '已交卷' : (done? '进行中':'未开始'));
+});
+let html = '';
+html += '<h2>题库</h2>' + (rowsB ? '<table class="tbl"><tr><th>题库</th><th>已做</th><th>进度</th><th>正确率</th><th>错题</th><th>收藏</th></tr>'+rowsB+'</table>' : '<div class="empty">还没有做过题库里的题。</div>');
+html += '<h2>模拟卷</h2>' + (rowsP ? '<table class="tbl"><tr><th>试卷</th><th>已答</th><th>进度</th><th>正确率</th><th>错题</th><th>状态</th></tr>'+rowsP+'</table>' : '<div class="empty">还没有做过模拟卷。</div>');
+document.getElementById('app').innerHTML = html;
+</script></body></html>
