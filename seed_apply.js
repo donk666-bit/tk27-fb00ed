@@ -35,9 +35,10 @@
     bst.wrong = mergeMaps(bst.wrong, nb.wrong);
     bst.collect = mergeMaps(bst.collect, nb.collect);
     if (nb.stats) {
-      bst.stats = bst.stats || {r:0,w:0};
+      bst.stats = bst.stats || {r:0,w:0,done:0};
       bst.stats.r = Math.max(bst.stats.r||0, nb.stats.r||0);
       bst.stats.w = Math.max(bst.stats.w||0, nb.stats.w||0);
+      bst.stats.done = Math.max(bst.stats.done||0, nb.stats.done||0);
     }
     if (nb.base) {
       bst.base = bst.base || {ch:{}, done:0};

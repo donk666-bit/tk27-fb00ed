@@ -42,8 +42,11 @@ banks.forEach(function(it){
   const right = Object.keys(ans).filter(function(k){ return ans[k] && ans[k].ok; }).length;
   let baseDone = 0;
   if (st.base && st.base.ch) { Object.keys(st.base.ch).forEach(function(k){ baseDone += st.base.ch[k] || 0 }); }
-  const done = Math.max(localDone, baseDone);
-  rowsB += row(it.name, it.url, done, it.total, localDone ? right : null, wrong, '收藏 '+collect);
+  const stDone = (st.stats && st.stats.done) || 0;
+  const done = Math.max(localDone, baseDone, stDone);
+  const stRight = (st.stats && st.stats.r) || 0;
+  const right = localDone ? Math.max(right, stRight) : (stRight || null);
+  rowsB += row(it.name, it.url, done, it.total, right, wrong, '收藏 '+collect);
 });
 papers.forEach(function(it){
   const st = read(it.key) || {};
