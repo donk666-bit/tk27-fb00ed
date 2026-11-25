@@ -45,8 +45,8 @@ banks.forEach(function(it){
   const stDone = (st.stats && st.stats.done) || 0;
   const done = Math.max(localDone, baseDone, stDone);
   const stRight = (st.stats && st.stats.r) || 0;
-  const right = localDone ? Math.max(right, stRight) : (stRight || null);
-  rowsB += row(it.name, it.url, done, it.total, right, wrong, '收藏 '+collect);
+  const rightShow = localDone ? Math.max(right, stRight) : (stRight || null);
+  rowsB += row(it.name, it.url, done, it.total, rightShow, wrong, '收藏 '+collect);
 });
 papers.forEach(function(it){
   const st = read(it.key) || {};
