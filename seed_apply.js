@@ -25,14 +25,26 @@
     }
     try { localStorage.setItem(key, JSON.stringify(st)); } catch(e){}
   }
-  var banks = S.banks || {}, bcur, bst;
+  var banks = S.banks || {}, bcur, bst, nb, ck;
   for (key in banks) {
     bcur = null;
     try { bcur = JSON.parse(localStorage.getItem(key) || "null"); } catch(e){}
     bst = Object.assign({ans:{}, wrong:{}, collect:{}}, bcur || {});
-    bst.ans = mergeMaps(bst.ans, banks[key].ans);
-    bst.wrong = mergeMaps(bst.wrong, banks[key].wrong);
-    bst.collect = mergeMaps(bst.collect, banks[key].collect);
+    nb = banks[key];
+    bst.ans = mergeMaps(bst.ans, nb.ans);
+    bst.wrong = mergeMaps(bst.wrong, nb.wrong);
+    bst.collect = mergeMaps(bst.collect, nb.collect);
+    if (nb.stats) {
+      bst.stats = bst.stats || {r:0,w:0};
+      bst.stats.r = Math.max(bst.stats.r||0, nb.stats.r||0);
+      bst.stats.w = Math.max(bst.stats.w||0, nb.stats.w||0);
+    }
+    if (nb.base) {
+      bst.base = bst.base || {ch:{}, done:0};
+      bst.base.done = Math.max(bst.base.done||0, nb.base.done||0);
+      bst.base.asof = bst.base.asof || nb.base.asof || "";
+      for (ck in (nb.base.ch||{})) bst.base.ch[ck] = Math.max(bst.base.ch[ck]||0, nb.base.ch[ck]);
+    }
     try { localStorage.setItem(key, JSON.stringify(bst)); } catch(e){}
   }
   try { localStorage.setItem("luoyan_seed_vers", VER); } catch(e){}

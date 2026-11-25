@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -83,6 +83,7 @@ let S = store.load();
 S.wrong = S.wrong || {}; S.collect = S.collect || {}; S.pos = S.pos || {};
 S.ans = S.ans || {}; S.stats = S.stats || {r:0,w:0};
 S.last = S.last || null;
+S.base = S.base || null;   // 小程序同步基线：{ch:{章key:done}, done, asof}
 store.save(S);
 
 const $ = id => document.getElementById(id);
@@ -92,7 +93,12 @@ let sess = null;   // {list, idx, mode, key}
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),1400); }
 function allQ(){ return DATA.chapters.flatMap(c=>c.qs); }
 function chapterWrongCount(c){ return c.qs.filter(q=>S.wrong[q.id]).length; }
-function chapterDone(c){ const p=S.pos[c.k]; return p==null?0:Math.min(p,c.qs.length); }
+function chapterDone(c){
+  const p=S.pos[c.k]; const local = p==null?0:Math.min(p,c.qs.length);
+  const answered = c.qs.filter(q=>S.ans[q.id]).length;
+  const base = (S.base && S.base.ch && typeof S.base.ch[c.k]==='number') ? Math.min(S.base.ch[c.k], c.qs.length) : 0;
+  return Math.max(local, answered, base);
+}
 function esc(s){ return (s||'').replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 
 function renderHome(){
@@ -116,11 +122,13 @@ function renderHome(){
       <div style="flex:1;min-width:0"><b>继续上次</b><span style="color:var(--sub);font-size:12px">　${esc(S.last.name||'')} · 第 ${(S.last.idx||0)+1} 题</span></div>
       <button class="btn primary" onclick="resumeLast()">继续</button>
     </div>` : ''}
+    ${S.base && S.base.done ? `<div class="card" style="font-size:13px;color:var(--sub)">已同步小程序做题进度：<b style="color:var(--ok)">${S.base.done}</b> 题${S.base.asof?`（${esc(S.base.asof)}）`:''}，进度条已按此显示</div>` : ''}
     <div class="card">
       ${DATA.chapters.map((c,i)=>{
         const done = chapterDone(c), pct = c.qs.length? Math.round(done/c.qs.length*100):0;
+        const bd = (S.base && S.base.ch && S.base.ch[c.k]) || 0;
         return `<div class="ch" onclick="startChapter(${i})">
-          <div class="t"><b>${esc(c.n)}</b><span>${c.qs.length} 题 · 错题 ${chapterWrongCount(c)} · 已做 ${done}</span>
+          <div class="t"><b>${esc(c.n)}</b><span>${c.qs.length} 题 · 错题 ${chapterWrongCount(c)} · 已做 ${done}${bd?`（小程序 ${bd}）`:''}</span>
           <div class="bar"><i style="width:${pct}%"></i></div></div>
           <button class="btn" style="padding:6px 10px;font-size:13px" onclick="event.stopPropagation();redoChapter(${i})">重做本章</button>
           <div style="color:var(--sub)">›</div>

@@ -38,11 +38,12 @@ banks.forEach(function(it){
   const wrong = st.wrong ? Object.keys(st.wrong).length : 0;
   const collect = st.collect ? Object.keys(st.collect).length : 0;
   const ans = st.ans || {};
-  const done = Object.keys(ans).length;
+  const localDone = Object.keys(ans).length;
   const right = Object.keys(ans).filter(function(k){ return ans[k] && ans[k].ok; }).length;
-  const stat = st.stats || {r:0,w:0};
-  if (!it._warned) it._warned = 0;
-  rowsB += row(it.name, it.url, done, it.total, right, wrong, '收藏 '+collect);
+  let baseDone = 0;
+  if (st.base && st.base.ch) { Object.keys(st.base.ch).forEach(function(k){ baseDone += st.base.ch[k] || 0 }); }
+  const done = Math.max(localDone, baseDone);
+  rowsB += row(it.name, it.url, done, it.total, localDone ? right : null, wrong, '收藏 '+collect);
 });
 papers.forEach(function(it){
   const st = read(it.key) || {};
